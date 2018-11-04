@@ -1,7 +1,3 @@
-
-
-message(STATUS "PCOM_INCLUDE_DIR: ${PCOM_INCLUDE_DIR}")
-
 set(PCOM_INC
 ${PCOM_INCLUDE_DIR}/pcom/pcom_circular_buffer.h
 ${PCOM_INCLUDE_DIR}/pcom/pcom_producer.h
@@ -22,4 +18,4 @@ target_include_directories(${PROJECT_NAME} INTERFACE
 
 install(DIRECTORY include/
         DESTINATION "/usr/local/include"
-      PATTERN "gmock/*" EXCLUDE )
+        PATTERN "gmock/*" EXCLUDE )
