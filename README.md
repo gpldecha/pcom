@@ -1,7 +1,6 @@
 # pcom
 process communication, header only library for easy inter process communication (single consumer single producer)
 
-___
 ### Install
 
 after cloning the repo
@@ -11,8 +10,6 @@ cmake ..
 sudo make install
 ```
 
-___
 ### Examples
 
-The directory [examples](https://github.com/gpldecha/pcom/tree/master/examples) has source code 
-of examples.
+See [examples](https://github.com/gpldecha/pcom/tree/master/examples).
