@@ -44,12 +44,14 @@ struct shared_memory_buffer{
     item_size_ = item_size.value;
     write_ = 0;
     read_ = 0;
+    size_ = 0;
   }
 
   std::vector<unsigned char, Alloc> cbuffer;
   unsigned int num_items_;
   unsigned int item_size_;
   unsigned int write_, read_;
+  unsigned int size_;
   boost::interprocess::interprocess_mutex mutex;
 };
 

@@ -30,24 +30,25 @@ namespace pcom{
         const unsigned char* head = boost::asio::buffer_cast<const unsigned char*>(item);
         std::copy(head, head + data->item_size_, data->cbuffer.begin() + data->write_);
         increment(&(data->write_));
-        data->num_items_++;
+        data->size_++;
         return true;
     }
 
     bool pop(boost::asio::mutable_buffer& item_dest){
       scoped_lock<interprocess_mutex> lock(data->mutex);
-      if(data->num_items_ == 0)
+      if(data->read_ == data->write_){
         return false;
+      }
       unsigned char* item_head = boost::asio::buffer_cast<unsigned char*>(item_dest);
       std::copy(data->cbuffer.begin()+data->read_, data->cbuffer.begin()+data->read_ + data->item_size_, item_head);
       increment(&(data->read_));
-      data->num_items_--;
+      data->size_--;
       return true;
     }
 
     const boost::asio::const_buffer operator [] (unsigned int i) const {
       scoped_lock<interprocess_mutex> lock(data->mutex);
-      if(i >= data->num_items_){
+      if(i >= data->size_){
         return boost::asio::const_buffer();
       }else{
         return boost::asio::const_buffer(&*(data->cbuffer.cbegin() + i*data->item_size_), data->item_size_);
@@ -56,7 +57,7 @@ namespace pcom{
 
     unsigned int size(){
       scoped_lock<interprocess_mutex> lock(data->mutex);
-      return data->num_items_;
+      return data->size_;
     }
 
   private:

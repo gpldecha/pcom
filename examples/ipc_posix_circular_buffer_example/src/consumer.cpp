@@ -13,7 +13,6 @@ bool is_running = true;
 
 void sighandler(int sig)
 {
-    cout<< "\nSignal " << sig << " caught..." << endl;
     is_running = false;
 }
 
@@ -25,15 +24,16 @@ int main(int argc, char** argv){
 
   Consumer consumer(NameId("array_data"));
 
-  std::cout<< "Start consuming" << std::endl;
-
-  std::array<double, 3> output;
+  std::array<int, 1> output;
   boost::asio::mutable_buffer b = boost::asio::buffer(output);
 
+  std::cout<< "Start consuming" << std::endl;
   while(is_running){
     if(consumer.receive(b)){
-      std::cout<< output[0] << " " << output[1] << " " << output[2]  << std::endl;
+      std::cout<< "received: " << output[0] << std::endl;
     }
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
   }
+  std::cout<< "exit" << std::endl;
   return 0;
 }

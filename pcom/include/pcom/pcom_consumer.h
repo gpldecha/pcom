@@ -32,6 +32,10 @@ namespace pcom{
       return circular_buffer.pop(item);
     }
 
+    unsigned int size(){
+      return circular_buffer.size();
+    }
+
 };
 
 }
