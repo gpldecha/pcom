@@ -1,0 +1,1 @@
+add_subdirectory(ipc_posix_circular_buffer_example)

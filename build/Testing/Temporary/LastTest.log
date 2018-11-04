@@ -1,0 +1,62 @@
+Start testing: Nov 03 17:19 GMT
+----------------------------------------------------------
+1/2 Testing: test_producer
+1/2 Test: test_producer
+Command: "/home/guillaume/cpp_work_space/pcom/build/test/test_producer/test_producer"
+Directory: /home/guillaume/cpp_work_space/pcom/build/test/test_producer
+"test_producer" start time: Nov 03 17:19 GMT
+Output:
+----------------------------------------------------------
+[==========] Running 1 test from 1 test case.
+[----------] Global test environment set-up.
+[----------] 1 test from ProducerTest
+[ RUN      ] ProducerTest.DoesConstruct
+create file: /tmp/joint_array
+[       OK ] ProducerTest.DoesConstruct (0 ms)
+[----------] 1 test from ProducerTest (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test case ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"test_producer" end time: Nov 03 17:19 GMT
+"test_producer" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/2 Testing: test_circular_buffer
+2/2 Test: test_circular_buffer
+Command: "/home/guillaume/cpp_work_space/pcom/build/test/test_circular_buffer/test_circular_buffer"
+Directory: /home/guillaume/cpp_work_space/pcom/build/test/test_circular_buffer
+"test_circular_buffer" start time: Nov 03 17:19 GMT
+Output:
+----------------------------------------------------------
+[==========] Running 5 tests from 1 test case.
+[----------] Global test environment set-up.
+[----------] 5 tests from CircularBufferTest
+[ RUN      ] CircularBufferTest.RandomAccessOperator
+[       OK ] CircularBufferTest.RandomAccessOperator (0 ms)
+[ RUN      ] CircularBufferTest.InsertMoreThanCapacity
+[       OK ] CircularBufferTest.InsertMoreThanCapacity (0 ms)
+[ RUN      ] CircularBufferTest.TestPop
+[       OK ] CircularBufferTest.TestPop (0 ms)
+[ RUN      ] CircularBufferTest.TestLargeInArrayItemRandomAcessOperator
+[       OK ] CircularBufferTest.TestLargeInArrayItemRandomAcessOperator (0 ms)
+[ RUN      ] CircularBufferTest.TestLargeFloatArrayItemRandomAcessOperator
+[       OK ] CircularBufferTest.TestLargeFloatArrayItemRandomAcessOperator (0 ms)
+[----------] 5 tests from CircularBufferTest (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 5 tests from 1 test case ran. (0 ms total)
+[  PASSED  ] 5 tests.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"test_circular_buffer" end time: Nov 03 17:19 GMT
+"test_circular_buffer" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Nov 03 17:19 GMT
