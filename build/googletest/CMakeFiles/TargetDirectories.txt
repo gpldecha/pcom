@@ -1,3 +1,0 @@
-/home/guillaume/cpp_work_space/pcom/build/googletest/CMakeFiles/edit_cache.dir
-/home/guillaume/cpp_work_space/pcom/build/googletest/CMakeFiles/rebuild_cache.dir
-/home/guillaume/cpp_work_space/pcom/build/googletest/CMakeFiles/googletest.dir

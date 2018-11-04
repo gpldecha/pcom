@@ -1,1 +1,0 @@
-/usr/bin/c++   -O1 -O2 -O3 -std=c++11 -Wall -Wno-write-strings -g   CMakeFiles/test_circular_buffer.dir/test_circular_buffer.cpp.o  -o test_circular_buffer ../../googletest/googletest-build/googlemock/gtest/libgtest_main.a /usr/lib/x86_64-linux-gnu/libboost_system.so ../../googletest/googletest-build/googlemock/gtest/libgtest.a -lpthread 

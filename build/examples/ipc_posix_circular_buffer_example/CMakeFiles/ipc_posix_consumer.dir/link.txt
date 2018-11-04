@@ -1,1 +1,0 @@
-/usr/bin/c++   -O1 -O2 -O3 -std=c++11 -Wall -Wno-write-strings -g   CMakeFiles/ipc_posix_consumer.dir/src/consumer.cpp.o  -o ipc_posix_consumer /usr/lib/x86_64-linux-gnu/libboost_system.so -lrt -lpthread 
