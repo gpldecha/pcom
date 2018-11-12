@@ -22,8 +22,9 @@ int main(int argc, char** argv){
 	signal(SIGTERM, &sighandler);
 	signal(SIGINT, &sighandler);
 
-  std::array<int, 1> input = {1};
-  Producer producer(NameId("array_data"), NumItems(5), ItemSize(get_size(input)));
+  //std::array<int, 1> input = {1};
+  std::vector<double> input(1); input[0] = 1;
+  Producer producer(NameId("my_data"), NumItems(5), ItemSize(get_size(input)));
 
   int count=0;
   std::cout<< "Start producing" << std::endl;

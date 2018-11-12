@@ -6,6 +6,8 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
 
+#include <boost/asio/buffer.hpp>
+
 namespace pcom{
 
 template<typename T>

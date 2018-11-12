@@ -22,9 +22,10 @@ int main(int argc, char** argv){
 	signal(SIGTERM, &sighandler);
 	signal(SIGINT, &sighandler);
 
-  Consumer consumer(NameId("array_data"));
+  Consumer consumer(NameId("my_data"));
 
-  std::array<int, 1> output;
+  //std::array<int, 1> output;
+  std::vector<double> output(1);
   boost::asio::mutable_buffer b = boost::asio::buffer(output);
 
   std::cout<< "Start consuming" << std::endl;

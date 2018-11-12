@@ -7,10 +7,13 @@ set(CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}" )
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
 set(COMPILE_TESTS false)
 
-set(PCOM_INCLUDE_DIR         ${CMAKE_CURRENT_SOURCE_DIR}/pcom/include)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib )
+
+set(PCOM_INCLUDE_DIR  ${CMAKE_CURRENT_SOURCE_DIR}/pcom/include)
 find_package(Boost REQUIRED COMPONENTS system)
 
 add_subdirectory(pcom)
+add_subdirectory(pypcom)
 
 # Examples
 
