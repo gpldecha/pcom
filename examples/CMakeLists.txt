@@ -1,1 +1,1 @@
-add_subdirectory(spsc_example)
+add_subdirectory(cpp)

@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "pcom/spsc_circular_buffer.h"
+#include "pcom/ipc/spsc_circular_buffer.h"
 #include <boost/asio.hpp>
 #include <array>
 

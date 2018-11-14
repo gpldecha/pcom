@@ -5,10 +5,10 @@
 #include <boost/python/extract.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 
-#include "pcom/pcom_utils.h"
-#include "pcom/pcom_types.h"
-#include "pcom/pcom_producer.h"
-#include "pcom/pcom_consumer.h"
+#include "pcom/ipc/pcom_utils.h"
+#include "pcom/ipc/pcom_types.h"
+#include "pcom/ipc/pcom_producer.h"
+#include "pcom/ipc/pcom_consumer.h"
 using namespace boost::python;
 
 
@@ -64,7 +64,7 @@ boost::python::list comsumer_receive(ArrayConsumer& array_consumer){
   }
 }
 
-BOOST_PYTHON_MODULE(pypcom){
+BOOST_PYTHON_MODULE(pypcomipc){
 
   class_<ArrayProducer>("ArrayDoubleProducer", init<std::string, int, int>())
     .def("send", producer_send);

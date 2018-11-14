@@ -12,5 +12,8 @@ message(STATUS "PCOM_INCLUDE_DIR: ${PCOM_INCLUDE_DIR}")
 
 message(STATUS "PYTHON_LIBRARIES: ${PYTHON_LIBRARIES}")
 
-python_add_module(pypcom src/pcom_module.cpp)
-target_link_libraries(pypcom ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} rt pthread)
+python_add_module(pypcomipc src/pcom_ipc_module.cpp)
+target_link_libraries(pypcomipc ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} rt pthread)
+
+python_add_module(pypcomtcp src/pcom_tcp_module.cpp)
+target_link_libraries(pypcomtcp ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} rt pthread)

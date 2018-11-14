@@ -1,9 +1,14 @@
 set(PCOM_INC
-${PCOM_INCLUDE_DIR}/pcom/pcom_circular_buffer.h
-${PCOM_INCLUDE_DIR}/pcom/pcom_producer.h
-${PCOM_INCLUDE_DIR}/pcom/pcom_consumer.h
-${PCOM_INCLUDE_DIR}/pcom/pcom_types.h
-${PCOM_INCLUDE_DIR}/pcom/pcom_utils.h)
+${PCOM_INCLUDE_DIR}/pcom/tcp/pcom_tcp_client.h
+${PCOM_INCLUDE_DIR}/pcom/tcp/pcom_tcp_server.h
+${PCOM_INCLUDE_DIR}/pcom/tcp/pcom_tcp_producer.h
+${PCOM_INCLUDE_DIR}/pcom/tcp/pcom_tcp_consumer.h
+${PCOM_INCLUDE_DIR}/pcom/ipc/pcom_circular_buffer.h
+${PCOM_INCLUDE_DIR}/pcom/ipc/pcom_producer.h
+${PCOM_INCLUDE_DIR}/pcom/ipc/pcom_consumer.h
+${PCOM_INCLUDE_DIR}/pcom/ipc/pcom_types.h
+${PCOM_INCLUDE_DIR}/pcom/ipc/pcom_utils.h)
+
 
 
 include_directories(${PCOM_INCLUDE_DIR})
