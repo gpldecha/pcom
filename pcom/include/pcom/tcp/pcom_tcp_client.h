@@ -1,6 +1,7 @@
 #ifndef PCOM_TCP_CLIENT_H
 #define PCOM_TCP_CLIENT_H
 
+#include <thread>
 #include <iostream>
 #include <boost/array.hpp>
 #include <boost/asio.hpp>
@@ -12,7 +13,10 @@ namespace pcom{
 
   public:
 
-      client(boost::asio::io_service& io_service, std::string host, int port, boost::circular_buffer<std::string>& msg_buffer):
+      client(boost::asio::io_service& io_service):
+      io_service(io_service), socket(io_service), deadline_(io_service), heartbeat_timer_(io_service){}
+
+      client(boost::asio::io_service& io_service, std::string host, int port, boost::circular_buffer<std::string>* msg_buffer):
       io_service(io_service), socket(io_service), deadline_(io_service), heartbeat_timer_(io_service), msg_buffer_(msg_buffer)
       {
 
@@ -29,15 +33,19 @@ namespace pcom{
 
       void start_connect(boost::asio::ip::tcp::resolver::iterator endpoint_iter){
          if (endpoint_iter != boost::asio::ip::tcp::resolver::iterator()){
-           std::cout << "Trying " << endpoint_iter->endpoint() << "...\n";
+           //std::cout << "Trying " << endpoint_iter->endpoint() << "...\n";
            // Set a deadline for the connect operation.
-           deadline_.expires_from_now(boost::posix_time::seconds(60));
+           deadline_.expires_from_now(boost::posix_time::seconds(5));
            // Start the asynchronous connect operation.
            socket.async_connect(endpoint_iter->endpoint(), std::bind(&client::handle_connect, this, std::placeholders::_1, endpoint_iter));
          }else{
            // There are no more endpoints to try. Shut down the client.
            stop();
          }
+       }
+
+       bool is_alive(){
+         return !stopped_;
        }
 
       void stop(){
@@ -55,12 +63,13 @@ namespace pcom{
              // Try the next available endpoint.
              start_connect(++endpoint_iterator);
           }else if(ec){
-              std::cout << "Connect error: " << ec.message() << "\n";
+              //std::cout << "Connect error: " << ec.message() << "\n";
               // We need to close the socket used in the previous connection attempt
               // before starting a new one.
-              socket.close();
+              //socket.close();
               // Try the next available endpoint.
-              start_connect(++endpoint_iterator);
+              std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+              start_connect(endpoint_iterator);
           }else{
               start_read();
               start_write();
@@ -69,7 +78,7 @@ namespace pcom{
 
       void start_read(){
           // Set a deadline for the read operation.
-          deadline_.expires_from_now(boost::posix_time::seconds(1));
+          deadline_.expires_from_now(boost::posix_time::seconds(5));
           boost::asio::async_read_until(socket, input_buffer_, '\n', std::bind(&client::handle_read, this, std::placeholders::_1));
       }
 
@@ -84,7 +93,7 @@ namespace pcom{
               // Empty messages are heartbeats and so ignored.
               if (!line.empty())
               {
-                msg_buffer_.push_back(line);
+                msg_buffer_->push_back(line);
               }
               start_read();
           }else{
@@ -139,7 +148,7 @@ namespace pcom{
       boost::asio::streambuf input_buffer_;
       boost::asio::deadline_timer deadline_;
       boost::asio::deadline_timer heartbeat_timer_;
-      boost::circular_buffer<std::string>& msg_buffer_;
+      boost::circular_buffer<std::string>* msg_buffer_;
       bool stopped_;
 
 

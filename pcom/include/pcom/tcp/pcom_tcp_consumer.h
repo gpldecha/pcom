@@ -11,8 +11,13 @@ class Consumer{
 
 public:
 
+  Consumer():
+  msg_buffer_(5), client_(io_service_){
+    
+  }
+
   Consumer(std::string host, unsigned int port, unsigned int buffer_size=5):
-  msg_buffer_(buffer_size), client_(io_service_, host, port, msg_buffer_)
+  msg_buffer_(buffer_size), client_(io_service_, host, port, &msg_buffer_)
   {
     thread_ = std::thread(&Consumer::run, this);
   }
@@ -24,6 +29,10 @@ public:
     msg = msg_buffer_.front();
     msg_buffer_.pop_front();
     return true;
+  }
+
+  bool is_alive(){
+    return client_.is_alive();
   }
 
 private:

@@ -12,6 +12,9 @@ class Consumer:
     def receive(self):
         return self._consumer.receive()
 
+    def is_alive(self):
+        return self._consumer.is_alive()
+
 
 if __name__ == "__main__":
     print('\nTCP Consumer')
@@ -23,4 +26,7 @@ if __name__ == "__main__":
         msg = consumer.receive()
         if msg is not None:
             print('got {}'.format(msg))
-        #time.sleep(1.0)
+        if not consumer.is_alive():
+            print('not alive anymore')
+            consumer = Consumer("127.0.0.1", 6066)
+            time.sleep(1.0)

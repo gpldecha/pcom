@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 project(pcom)
 
-set(CMAKE_CXX_FLAGS "-O3 -std=c++11 -Wall -Wno-write-strings")        ## Optimize
+set(CMAKE_CXX_FLAGS "-O3 -std=c++14 -Wall -Wno-write-strings")        ## Optimize
 set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_CXX_FLAGS_DEBUG   "${CMAKE_CXX_FLAGS_DEBUG}" )
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")

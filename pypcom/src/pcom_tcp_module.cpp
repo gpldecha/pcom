@@ -24,18 +24,25 @@ public:
   TCPConsumer(){};
   TCPConsumer(std::string host, unsigned int port, unsigned int buffer_size)
   {
-    consumer.reset(new pcom::tcp::Consumer(host, port, buffer_size));
+    consumer = pcom::tcp::Consumer(host, port, buffer_size);
   }
-  std::shared_ptr<pcom::tcp::Consumer> consumer;
+  TCPConsumer(const TCPConsumer&){
+
+  }
+  bool is_alive(){
+    return consumer.is_alive();
+  }
+  pcom::tcp::Consumer consumer;
   std::string msg;
 };
+
 
 void producer_send(TCPProducer& tcp_producer, std::string msg){
     tcp_producer.producer->send(msg);
 }
 
 boost::python::object consumer_receive(TCPConsumer& tcp_consumer){
-  if(tcp_consumer.consumer->receive(tcp_consumer.msg)){
+  if(tcp_consumer.consumer.receive(tcp_consumer.msg)){
     return object(tcp_consumer.msg);
   }else{
     return object(); // None
@@ -48,6 +55,8 @@ BOOST_PYTHON_MODULE(pypcomtcp){
   .def("send", producer_send);
 
   class_<TCPConsumer>("TCPConsumer", init<std::string, unsigned int, unsigned int>())
+   .def("is_alive", &TCPConsumer::is_alive)
    .def("receive", consumer_receive);
+
 
 }
