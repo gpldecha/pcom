@@ -1,8 +1,8 @@
 #ifndef PCOM_CONSUMER_H
 #define PCOM_CONSUMER_H
 
-#include "pcom/pcom_types.h"
-#include "pcom/pcom_circular_buffer.h"
+#include "pcom/ipc/pcom_types.h"
+#include "pcom/ipc/pcom_circular_buffer.h"
 
 namespace pcom{
 

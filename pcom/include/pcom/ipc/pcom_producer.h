@@ -1,8 +1,8 @@
 #ifndef PCOM_PRODUCER_H
 #define PCOM_PRODUCER_H
 
-#include "pcom/pcom_types.h"
-#include "pcom/pcom_circular_buffer.h"
+#include "pcom/ipc/pcom_types.h"
+#include "pcom/ipc/pcom_circular_buffer.h"
 
 namespace pcom{
 

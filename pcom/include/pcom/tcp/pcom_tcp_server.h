@@ -7,6 +7,7 @@
 #include <iostream>
 #include <set>
 #include <boost/bind.hpp>
+#include <boost/circular_buffer.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/asio/deadline_timer.hpp>
@@ -27,7 +28,7 @@ namespace pcom{
   class subscriber{
   public:
     virtual ~subscriber() {}
-    virtual void deliver(const std::string& msg) = 0;
+    virtual void deliver(const boost::asio::const_buffer& item) = 0;
   };
 
   typedef boost::shared_ptr<subscriber> subscriber_ptr;
@@ -44,13 +45,13 @@ namespace pcom{
       subscribers_.erase(subscriber);
     }
 
-    void deliver(const std::string& msg)
+    void deliver(const boost::asio::const_buffer& item)
     {
-      std::for_each(subscribers_.begin(), subscribers_.end(), boost::bind(&subscriber::deliver, _1, boost::ref(msg)));
+      std::for_each(subscribers_.begin(), subscribers_.end(), boost::bind(&subscriber::deliver, _1, boost::ref(item)));
     }
 
     void close(){
-        std::for_each(subscribers_.begin(), subscribers_.end(), [this](subscriber_ptr p){leave(p);});
+        //std::for_each(subscribers_.begin(), subscribers_.end(), [this](subscriber_ptr p){leave(p);});
     }
   private:
     std::set<subscriber_ptr> subscribers_;
@@ -66,13 +67,13 @@ namespace pcom{
       non_empty_output_queue_(io_service),
       output_deadline_(io_service)
   {
-    input_deadline_.expires_at(boost::posix_time::pos_infin);
+    /*input_deadline_.expires_at(boost::posix_time::pos_infin);
     output_deadline_.expires_at(boost::posix_time::pos_infin);
 
     // The non_empty_output_queue_ deadline_timer is set to pos_infin whenever
     // the output queue is empty. This ensures that the output actor stays
     // asleep until a message is put into the queue.
-    non_empty_output_queue_.expires_at(boost::posix_time::pos_infin);
+    non_empty_output_queue_.expires_at(boost::posix_time::pos_infin);*/
   }
 
   boost::asio::ip::tcp::socket& socket()
@@ -83,7 +84,7 @@ namespace pcom{
   // Called by the server object to initiate the four actors.
   void start()
   {
-    channel_.join(shared_from_this());
+    /*channel_.join(shared_from_this());
 
     start_read();
 
@@ -95,7 +96,7 @@ namespace pcom{
 
     output_deadline_.async_wait(
         boost::bind(&tcp_session::check_deadline,
-        shared_from_this(), &output_deadline_));
+        shared_from_this(), &output_deadline_));*/
   }
 
 private:
@@ -115,9 +116,12 @@ private:
     return !socket_.is_open();
   }
 
-  void deliver(const std::string& msg)
+  void deliver(const boost::asio::const_buffer& item)
   {
-    output_queue_.push_back(msg + "\n");
+    std::vector<unsigned char> data(boost::asio::buffer_size(item));
+    boost::asio::buffer_copy(boost::asio::buffer(data), item);
+
+    output_queue_.push_back(boost::asio::buffer(data));
 
     // Signal that the output queue contains messages. Modifying the expiry
     // will wake the output actor, if it is waiting on the timer.
@@ -148,7 +152,7 @@ private:
 
       if (!msg.empty())
       {
-        channel_.deliver(msg);
+        channel_.deliver(boost::asio::buffer(msg));
       }
       else
       {
@@ -156,7 +160,10 @@ private:
         // else being sent or ready to be sent, send a heartbeat right back.
         if (output_queue_.empty())
         {
-          output_queue_.push_back("\n");
+          // TODO: send something back
+          std::vector<unsigned char> data;
+          data.push_back('\n');
+          output_queue_.push_back(boost::asio::buffer(data));
 
           // Signal that the output queue contains messages. Modifying the
           // expiry will wake the output actor, if it is waiting on the timer.
@@ -198,8 +205,7 @@ private:
     output_deadline_.expires_from_now(boost::posix_time::seconds(30));
 
     // Start an asynchronous operation to send a message.
-    boost::asio::async_write(socket_,
-        boost::asio::buffer(output_queue_.front()),
+    boost::asio::async_write(socket_,output_queue_.front(),
         boost::bind(&tcp_session::handle_write, shared_from_this(), _1));
   }
 
@@ -247,7 +253,7 @@ private:
   tcp::socket socket_;
   boost::asio::streambuf input_buffer_;
   deadline_timer input_deadline_;
-  std::deque<std::string> output_queue_;
+  std::deque<boost::asio::mutable_buffers_1> output_queue_;
   deadline_timer non_empty_output_queue_;
   deadline_timer output_deadline_;
 };
@@ -266,10 +272,12 @@ public:
   }
 
 private:
-  void deliver(const std::string& msg)
+  void deliver(const boost::asio::const_buffer& msg)
   {
     boost::system::error_code ignored_ec;
-    socket_.send(boost::asio::buffer(msg), 0, ignored_ec);
+    std::vector<unsigned char> data(boost::asio::buffer_size(msg));
+    boost::asio::buffer_copy(boost::asio::buffer(data), msg);
+    socket_.send(boost::asio::buffer(data), 0, ignored_ec);
   }
 
   udp::socket socket_;

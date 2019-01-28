@@ -3,6 +3,7 @@
 
 // STL
 #include <string>
+#include <vector>
 
 // Boost
 #include <boost/interprocess/allocators/allocator.hpp>

@@ -18,8 +18,8 @@ public:
     thread_ = std::thread(&Producer::run, this);
   }
 
-  void send(const std::string& msg){
-    server_.channel_.deliver(msg);
+  void send(const boost::asio::const_buffer& item){
+    server_.channel_.deliver(item);
   }
 
 private:

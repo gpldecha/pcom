@@ -3,7 +3,7 @@
 
 #include <string>
 #include <boost/asio/buffer.hpp>
-#include "pcom/pcom_types.h"
+#include "pcom/ipc/pcom_types.h"
 
 using namespace boost::interprocess;
 

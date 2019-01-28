@@ -10,6 +10,7 @@ ${PCOM_INCLUDE_DIR}/pcom/ipc/pcom_types.h
 ${PCOM_INCLUDE_DIR}/pcom/ipc/pcom_utils.h)
 
 
+message("enclude dir: ${PCOM_INCLUDE_DIR}")
 
 include_directories(${PCOM_INCLUDE_DIR})
 
