@@ -2,9 +2,10 @@
 #include <array>
 #include <chrono>
 #include <thread>
+#include <signal.h>
+
 #include "pcom/ipc/pcom_producer.h"
 #include "pcom/ipc/pcom_utils.h"
-#include <signal.h>
 
 using namespace std;
 using namespace pcom;
