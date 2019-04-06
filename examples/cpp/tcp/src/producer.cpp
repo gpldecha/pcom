@@ -1,28 +1,34 @@
 #include <thread>
+#include <signal.h>
+
 #include "pcom/tcp/pcom_tcp_producer.h"
-#include <sched.h>
+
+bool is_running = true;
+
+
+void sighandler(int sig)
+{
+    is_running = false;
+}
+
 
 int main(int argc, char** argv)
 {
-  struct sched_param sched;
-  sched.sched_priority = 1;
-  if (sched_setscheduler(getpid(), SCHED_FIFO, &sched) < 0) {
-      exit(EXIT_FAILURE);
+    signal(SIGABRT, &sighandler);
+    signal(SIGTERM, &sighandler);
+    signal(SIGINT, &sighandler);
+
+    pcom::tcp::Producer producer(6067);
+    std::string msg;
+    int count=0;
+    while(is_running){
+        msg = std::to_string(count) + "\n";
+        //boost::asio::const_buffer bit_msg = boost::asio::buffer(msg);
+        //std::cout<< "string size: " << msg.size() << std::endl;
+        //std::cout<< "bit msg:     " <<  boost::asio::buffer_size(bit_msg) << std::endl;
+        producer.send(boost::asio::buffer(msg));
+        count++;
+        std::this_thread::sleep_for(std::chrono::seconds(1));
     }
-
-    std::cout<< "getpid(): " << getpid() << std::endl;
-
-  pcom::tcp::Producer producer(6066);
-
-  std::string msg;
-  int count=0;
-  while(true)
-  {
-    msg = std::to_string(count);
-    //producer.send(boost::asio::buffer(msg));
-    count++;
-    std::this_thread::sleep_for(std::chrono::duration<double>(1));
-  }
-
   return 0;
 }

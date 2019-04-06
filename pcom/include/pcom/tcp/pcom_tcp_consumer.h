@@ -19,20 +19,20 @@ public:
   Consumer(std::string host, unsigned int port, unsigned int buffer_size=5):
   msg_buffer_(buffer_size), client_(io_service_, host, port, &msg_buffer_)
   {
-    thread_ = std::thread(&Consumer::run, this);
+       thread_ = std::thread(&Consumer::run, this);
   }
 
   bool receive(std::string& msg){
-    if(msg_buffer_.empty()){
-      return false;
-    }
-    msg = msg_buffer_.front();
-    msg_buffer_.pop_front();
-    return true;
+      if(msg_buffer_.empty()){
+        return false;
+      }
+      msg = msg_buffer_.front();
+      msg_buffer_.pop_front();
+      return true;
   }
 
   bool is_alive(){
-    return client_.is_alive();
+      return client_.is_alive();
   }
 
 private:

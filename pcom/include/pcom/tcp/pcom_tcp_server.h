@@ -25,15 +25,15 @@ using boost::asio::ip::udp;
 
 namespace pcom{
 
-  class subscriber{
+class subscriber{
   public:
     virtual ~subscriber() {}
     virtual void deliver(const boost::asio::const_buffer& item) = 0;
   };
 
-  typedef boost::shared_ptr<subscriber> subscriber_ptr;
+typedef boost::shared_ptr<subscriber> subscriber_ptr;
 
-  class channel{
+class channel{
   public:
     void join(subscriber_ptr subscriber)
     {
@@ -47,17 +47,17 @@ namespace pcom{
 
     void deliver(const boost::asio::const_buffer& item)
     {
-      std::for_each(subscribers_.begin(), subscribers_.end(), boost::bind(&subscriber::deliver, _1, boost::ref(item)));
+        std::for_each(subscribers_.begin(), subscribers_.end(), boost::bind(&subscriber::deliver, _1, boost::ref(item)));
     }
 
     void close(){
-        //std::for_each(subscribers_.begin(), subscribers_.end(), [this](subscriber_ptr p){leave(p);});
+        std::for_each(subscribers_.begin(), subscribers_.end(), [this](subscriber_ptr p){leave(p);});
     }
   private:
     std::set<subscriber_ptr> subscribers_;
   };
 
-  class tcp_session : public subscriber, public boost::enable_shared_from_this<tcp_session>{
+class tcp_session : public subscriber, public boost::enable_shared_from_this<tcp_session>{
 
   public:
   tcp_session(boost::asio::io_service& io_service, channel& ch)
@@ -67,13 +67,13 @@ namespace pcom{
       non_empty_output_queue_(io_service),
       output_deadline_(io_service)
   {
-    /*input_deadline_.expires_at(boost::posix_time::pos_infin);
+    input_deadline_.expires_at(boost::posix_time::pos_infin);
     output_deadline_.expires_at(boost::posix_time::pos_infin);
 
     // The non_empty_output_queue_ deadline_timer is set to pos_infin whenever
     // the output queue is empty. This ensures that the output actor stays
     // asleep until a message is put into the queue.
-    non_empty_output_queue_.expires_at(boost::posix_time::pos_infin);*/
+    non_empty_output_queue_.expires_at(boost::posix_time::pos_infin);
   }
 
   boost::asio::ip::tcp::socket& socket()
@@ -84,7 +84,7 @@ namespace pcom{
   // Called by the server object to initiate the four actors.
   void start()
   {
-    /*channel_.join(shared_from_this());
+    channel_.join(shared_from_this());
 
     start_read();
 
@@ -96,10 +96,11 @@ namespace pcom{
 
     output_deadline_.async_wait(
         boost::bind(&tcp_session::check_deadline,
-        shared_from_this(), &output_deadline_));*/
+        shared_from_this(), &output_deadline_));
   }
 
 private:
+
   void stop()
   {
     channel_.leave(shared_from_this());
@@ -121,7 +122,8 @@ private:
     std::vector<unsigned char> data(boost::asio::buffer_size(item));
     boost::asio::buffer_copy(boost::asio::buffer(data), item);
 
-    output_queue_.push_back(boost::asio::buffer(data));
+    //output_queue_.push_back(boost::asio::buffer(data));
+    output_queue_.push_back(data);
 
     // Signal that the output queue contains messages. Modifying the expiry
     // will wake the output actor, if it is waiting on the timer.
@@ -134,8 +136,7 @@ private:
     input_deadline_.expires_from_now(boost::posix_time::seconds(30));
 
     // Start an asynchronous operation to read a newline-delimited message.
-    boost::asio::async_read_until(socket_, input_buffer_, '\n',
-        boost::bind(&tcp_session::handle_read, shared_from_this(), _1));
+    boost::asio::async_read_until(socket_, input_buffer_, "\n", boost::bind(&tcp_session::handle_read, shared_from_this(), _1));
   }
 
   void handle_read(const boost::system::error_code& ec)
@@ -163,7 +164,8 @@ private:
           // TODO: send something back
           std::vector<unsigned char> data;
           data.push_back('\n');
-          output_queue_.push_back(boost::asio::buffer(data));
+          //output_queue_.push_back(boost::asio::buffer(data));
+          output_queue_.push_back(data);
 
           // Signal that the output queue contains messages. Modifying the
           // expiry will wake the output actor, if it is waiting on the timer.
@@ -181,8 +183,9 @@ private:
 
   void await_output()
   {
-    if (stopped())
+    if (stopped()){
       return;
+    }
 
     if (output_queue_.empty())
     {
@@ -190,8 +193,7 @@ private:
       // sleep by waiting on the non_empty_output_queue_ timer. When a new
       // message is added, the timer will be modified and the actor will wake.
       non_empty_output_queue_.expires_at(boost::posix_time::pos_infin);
-      non_empty_output_queue_.async_wait(
-          boost::bind(&tcp_session::await_output, shared_from_this()));
+      non_empty_output_queue_.async_wait(boost::bind(&tcp_session::await_output, shared_from_this()));
     }
     else
     {
@@ -203,10 +205,12 @@ private:
   {
     // Set a deadline for the write operation.
     output_deadline_.expires_from_now(boost::posix_time::seconds(30));
-
+     std::cout<< "start_write" << std::endl;
     // Start an asynchronous operation to send a message.
-    boost::asio::async_write(socket_,output_queue_.front(),
-        boost::bind(&tcp_session::handle_write, shared_from_this(), _1));
+    auto data = output_queue_.front();
+    //std::cout<< "   item of size: " << boost::asio::buffer_size(data) << std::endl;
+    boost::asio::async_write(socket_, boost::asio::buffer(data), boost::asio::transfer_all(), boost::bind(&tcp_session::handle_write, shared_from_this(), _1));
+
   }
 
   void handle_write(const boost::system::error_code& ec)
@@ -217,7 +221,6 @@ private:
     if (!ec)
     {
       output_queue_.pop_front();
-
       await_output();
     }
     else
@@ -253,7 +256,7 @@ private:
   tcp::socket socket_;
   boost::asio::streambuf input_buffer_;
   deadline_timer input_deadline_;
-  std::deque<boost::asio::mutable_buffers_1> output_queue_;
+  std::deque<std::vector<unsigned char> > output_queue_;
   deadline_timer non_empty_output_queue_;
   deadline_timer output_deadline_;
 };
@@ -293,27 +296,23 @@ public:
     : io_service_(io_service),
       acceptor_(io_service, listen_endpoint)
   {
-    subscriber_ptr bc(new udp_broadcaster(io_service_, broadcast_endpoint));
-    channel_.join(bc);
+    //subscriber_ptr bc(new udp_broadcaster(io_service_, broadcast_endpoint));
+    //channel_.join(bc);
     start_accept();
   }
 
   void start_accept()
   {
-      std::cout<<"start accept"<< std::endl;
-    tcp_session_ptr new_session(new tcp_session(io_service_, channel_));
-    acceptor_.async_accept(new_session->socket(), boost::bind(&server::handle_accept, this, new_session, _1));
+      tcp_session_ptr new_session(new tcp_session(io_service_, channel_));
+      acceptor_.async_accept(new_session->socket(), boost::bind(&server::handle_accept, this, new_session, _1));
   }
 
-  void handle_accept(tcp_session_ptr session,
-      const boost::system::error_code& ec)
+  void handle_accept(tcp_session_ptr session, const boost::system::error_code& ec)
   {
     if (!ec)
     {
-     std::cout<<"start "<< std::endl;
       session->start();
     }
-
     start_accept();
   }
 

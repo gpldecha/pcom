@@ -33,7 +33,7 @@ namespace pcom{
 
       void start_connect(boost::asio::ip::tcp::resolver::iterator endpoint_iter){
          if (endpoint_iter != boost::asio::ip::tcp::resolver::iterator()){
-           //std::cout << "Trying " << endpoint_iter->endpoint() << "...\n";
+           std::cout << "Trying " << endpoint_iter->endpoint() << "...\n";
            // Set a deadline for the connect operation.
            deadline_.expires_from_now(boost::posix_time::seconds(5));
            // Start the asynchronous connect operation.
@@ -56,14 +56,17 @@ namespace pcom{
        }
 
       void handle_connect(const boost::system::error_code& ec,  boost::asio::ip::tcp::resolver::iterator endpoint_iterator){
-          if (stopped_)
+          std::cout<< "handle_connect" << std::endl;
+          if (stopped_){
+                std::cout<< "stopped_" << std::endl;
               return;
+          }
           if (!socket.is_open()){
              std::cout << "Connect timed out\n";
              // Try the next available endpoint.
              start_connect(++endpoint_iterator);
           }else if(ec){
-              //std::cout << "Connect error: " << ec.message() << "\n";
+              std::cout << "Connect error: " << ec.message() << "\n";
               // We need to close the socket used in the previous connection attempt
               // before starting a new one.
               //socket.close();
@@ -79,24 +82,42 @@ namespace pcom{
       void start_read(){
           // Set a deadline for the read operation.
           deadline_.expires_from_now(boost::posix_time::seconds(5));
-          boost::asio::async_read_until(socket, input_buffer_, '\n', std::bind(&client::handle_read, this, std::placeholders::_1));
+          std::cout<< "start read" << std::endl;
+          // boost::asio::async_read_until(socket, input_buffer_, "\n", std::bind(&client::handle_read, this, std::placeholders::_1));
+          // boost::asio::async_read(socket, input_buffer_, boost::asio::transfer_exactly(sizeof(uint64_t)), std::bind(&client::handle_read, this, std::placeholders::_1));
+          boost::asio::async_read_until(socket, input_buffer_, "\n", std::bind(&client::handle_read, this, std::placeholders::_1));
+
       }
 
       void handle_read(const boost::system::error_code& ec){
-          if (stopped_)
-               return;
+          std::cout<< "handle_read # 1" << std::endl;
+          if (stopped_){
+              std::cout<< "stopped" << std::endl;
+              return;
+          }
           if (!ec){
+              std::cout<< "extract a new line # 2" << std::endl;
+              // Process the response headers.
+              std::istream response_stream(&input_buffer_);
+              std::string header;
+              while(std::getline(response_stream, header) && header != "\n")
+                  std::cout << header << "\n";
+              std::cout << "\n";
+
+
               // Extract the newline-delimited message from the buffer.
-              std::string line;
+              /*std::string line;
               std::istream is(&input_buffer_);
               std::getline(is, line);
+              std::cout<< "line: " <<  line << std::endl;
               // Empty messages are heartbeats and so ignored.
               if (!line.empty())
               {
                 msg_buffer_->push_back(line);
-              }
+              }*/
               start_read();
           }else{
+              std::cout<< "stop" << std::endl;
               stop();
           }
       }
@@ -105,6 +126,7 @@ namespace pcom{
           if (stopped_)
               return;
           // Start an asynchronous operation to send a heartbeat message.
+          std::cout<< "start write" << std::endl;
           boost::asio::async_write(socket, boost::asio::buffer("\n", 1), std::bind(&client::handle_write, this, std::placeholders::_1));
       }
 
