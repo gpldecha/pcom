@@ -22,13 +22,13 @@ int main(int argc, char** argv)
     std::string msg;
     int count=0;
     while(is_running){
-        msg = std::to_string(count) + "\n";
-        //boost::asio::const_buffer bit_msg = boost::asio::buffer(msg);
-        //std::cout<< "string size: " << msg.size() << std::endl;
-        //std::cout<< "bit msg:     " <<  boost::asio::buffer_size(bit_msg) << std::endl;
+        std::cout<< "send: " << count << std::endl;
+        msg = std::to_string(count);
         producer.send(boost::asio::buffer(msg));
         count++;
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+        //std::this_thread::sleep_for(std::chrono::seconds(1));
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
     }
   return 0;
 }
