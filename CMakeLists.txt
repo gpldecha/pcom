@@ -11,11 +11,12 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib )
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/bin/)
 
 set(PCOM_INCLUDE_DIR  ${CMAKE_CURRENT_SOURCE_DIR}/pcom/include)
+set(PCAM_INCLUDE_DIR  ${CMAKE_CURRENT_SOURCE_DIR}/pcam/include)
+
 find_package(Boost REQUIRED COMPONENTS system)
 
 add_subdirectory(pcom)
 #add_subdirectory(pypcom)
-
 add_subdirectory(pcam)
 
 # Examples
