@@ -22,7 +22,7 @@ public:
        thread_ = std::thread(&Consumer::run, this);
   }
 
-  bool receive(std::string& msg){
+  bool receive(std::vector<unsigned char>& msg){
       if(msg_buffer_.empty()){
         return false;
       }
@@ -41,7 +41,7 @@ private:
 
 private:
 
-  boost::circular_buffer<std::string> msg_buffer_;
+  boost::circular_buffer<std::vector<unsigned char> > msg_buffer_;
   boost::asio::io_service io_service_;
   pcom::client client_;
   std::thread thread_;

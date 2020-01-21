@@ -16,7 +16,7 @@ namespace pcom{
       client(boost::asio::io_service& io_service):
       io_service(io_service), socket(io_service), deadline_(io_service), heartbeat_timer_(io_service){}
 
-      client(boost::asio::io_service& io_service, std::string host, int port, boost::circular_buffer<std::string>* msg_buffer):
+      client(boost::asio::io_service& io_service, std::string host, int port, boost::circular_buffer<std::vector<unsigned char>>* msg_buffer):
       io_service(io_service), socket(io_service), deadline_(io_service), heartbeat_timer_(io_service), msg_buffer_(msg_buffer)
       {
 
@@ -82,39 +82,24 @@ namespace pcom{
       void start_read(){
           // Set a deadline for the read operation.
           deadline_.expires_from_now(boost::posix_time::seconds(5));
-          std::cout<< "start read" << std::endl;
-          // boost::asio::async_read_until(socket, input_buffer_, "\n", std::bind(&client::handle_read, this, std::placeholders::_1));
-          // boost::asio::async_read(socket, input_buffer_, boost::asio::transfer_exactly(sizeof(uint64_t)), std::bind(&client::handle_read, this, std::placeholders::_1));
-          boost::asio::async_read_until(socket, input_buffer_, "\n", std::bind(&client::handle_read, this, std::placeholders::_1));
-
+          boost::asio::async_read_until(socket, input_buffer_, "\n", std::bind(&client::handle_read, this, std::placeholders::_1, std::placeholders::_2));
+          // boost::asio::async_read(socket, input_buffer_, boost::asio::transfer_exactly(30000), std::bind(&client::handle_read, this, std::placeholders::_1, std::placeholders::_2));
+          //boost::asio::async_read(socket, input_buffer_, boost::asio::transfer_all(), std::bind(&client::handle_read, this, std::placeholders::_1, std::placeholders::_2));
       }
 
-      void handle_read(const boost::system::error_code& ec){
-          std::cout<< "handle_read # 1" << std::endl;
+      void handle_read(const boost::system::error_code& ec, std::size_t bytes_transferred){
           if (stopped_){
               std::cout<< "stopped" << std::endl;
               return;
           }
           if (!ec){
-              std::cout<< "extract a new line # 2" << std::endl;
-              // Process the response headers.
+              std::cout<< "bytes_transferred: " << bytes_transferred << std::endl;
               std::istream response_stream(&input_buffer_);
               std::string header;
-              while(std::getline(response_stream, header) && header != "\n")
-                  std::cout << header << "\n";
-              std::cout << "\n";
-
-
-              // Extract the newline-delimited message from the buffer.
-              /*std::string line;
-              std::istream is(&input_buffer_);
-              std::getline(is, line);
-              std::cout<< "line: " <<  line << std::endl;
-              // Empty messages are heartbeats and so ignored.
-              if (!line.empty())
-              {
-                msg_buffer_->push_back(line);
-              }*/
+              while(std::getline(response_stream, header) && header != "\n"){
+                  std::vector<unsigned char> data(header.begin(), header.end());
+                  msg_buffer_->push_back(data);
+              }
               start_read();
           }else{
               std::cout<< "stop" << std::endl;
@@ -126,7 +111,6 @@ namespace pcom{
           if (stopped_)
               return;
           // Start an asynchronous operation to send a heartbeat message.
-          std::cout<< "start write" << std::endl;
           boost::asio::async_write(socket, boost::asio::buffer("\n", 1), std::bind(&client::handle_write, this, std::placeholders::_1));
       }
 
@@ -170,7 +154,7 @@ namespace pcom{
       boost::asio::streambuf input_buffer_;
       boost::asio::deadline_timer deadline_;
       boost::asio::deadline_timer heartbeat_timer_;
-      boost::circular_buffer<std::string>* msg_buffer_;
+      boost::circular_buffer<std::vector<unsigned char> >* msg_buffer_;
       bool stopped_;
 
 

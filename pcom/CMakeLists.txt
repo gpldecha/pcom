@@ -1,6 +1,8 @@
 set(PCOM_INC
 ${PCOM_INCLUDE_DIR}/pcom/tcp/pcom_tcp_client.h
+${PCOM_INCLUDE_DIR}/pcom/tcp/pcom_tcp_synchronous_client.h
 ${PCOM_INCLUDE_DIR}/pcom/tcp/pcom_tcp_server.h
+${PCOM_INCLUDE_DIR}/pcom/tcp/pcom_tcp_synchronous_server.h
 ${PCOM_INCLUDE_DIR}/pcom/tcp/pcom_tcp_producer.h
 ${PCOM_INCLUDE_DIR}/pcom/tcp/pcom_tcp_consumer.h
 ${PCOM_INCLUDE_DIR}/pcom/ipc/pcom_circular_buffer.h
@@ -9,8 +11,6 @@ ${PCOM_INCLUDE_DIR}/pcom/ipc/pcom_consumer.h
 ${PCOM_INCLUDE_DIR}/pcom/ipc/pcom_types.h
 ${PCOM_INCLUDE_DIR}/pcom/ipc/pcom_utils.h)
 
-
-message("enclude dir: ${PCOM_INCLUDE_DIR}")
 
 include_directories(${PCOM_INCLUDE_DIR})
 

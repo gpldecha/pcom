@@ -121,9 +121,9 @@ private:
   {
     std::vector<unsigned char> data(boost::asio::buffer_size(item));
     boost::asio::buffer_copy(boost::asio::buffer(data), item);
-
-    //output_queue_.push_back(boost::asio::buffer(data));
+    data.push_back('\n');
     output_queue_.push_back(data);
+    std::cout<< output_queue_.size() << std::endl;
 
     // Signal that the output queue contains messages. Modifying the expiry
     // will wake the output actor, if it is waiting on the timer.
@@ -197,6 +197,7 @@ private:
     }
     else
     {
+      std::cout<< "pcom_tcp_server start_write()" << std::endl;
       start_write();
     }
   }
@@ -204,21 +205,19 @@ private:
   void start_write()
   {
     // Set a deadline for the write operation.
-    output_deadline_.expires_from_now(boost::posix_time::seconds(30));
-     std::cout<< "start_write" << std::endl;
-    // Start an asynchronous operation to send a message.
+    output_deadline_.expires_from_now(boost::posix_time::seconds(10));
     auto data = output_queue_.front();
-    //std::cout<< "   item of size: " << boost::asio::buffer_size(data) << std::endl;
-    boost::asio::async_write(socket_, boost::asio::buffer(data), boost::asio::transfer_all(), boost::bind(&tcp_session::handle_write, shared_from_this(), _1));
+    // boost::asio::async_write(socket_, boost::asio::buffer(data), boost::asio::transfer_all(), boost::bind(&tcp_session::handle_write, shared_from_this(), _1, _2));
+    boost::asio::async_write(socket_, boost::asio::buffer(data), boost::asio::transfer_all(), boost::bind(&tcp_session::handle_write, shared_from_this(), _1, _2));
 
   }
 
-  void handle_write(const boost::system::error_code& ec)
+  void handle_write(const boost::system::error_code& error_code, std::size_t bytes_transferred)
   {
     if (stopped())
       return;
-
-    if (!ec)
+    std::cout<< "bytes_transferred: " << bytes_transferred << std::endl;
+    if (!error_code)
     {
       output_queue_.pop_front();
       await_output();
@@ -246,9 +245,7 @@ private:
     else
     {
       // Put the actor back to sleep.
-      deadline->async_wait(
-          boost::bind(&tcp_session::check_deadline,
-          shared_from_this(), deadline));
+      deadline->async_wait(boost::bind(&tcp_session::check_deadline, shared_from_this(), deadline));
     }
   }
 

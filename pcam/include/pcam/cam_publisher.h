@@ -1,5 +1,5 @@
-#ifndef PCAM_VDIEO_CAPTURE_H_
-#define PCAM_VDIEO_CAPTURE_H_
+#ifndef PCAM_CAM_PUBLISHER_H_
+#define PCAM_CAM_PUBLISHER_H_
 
 //stl
 #include <thread>
@@ -14,23 +14,22 @@
 
 namespace pcam{
 
-class VideoCapture{
+class CamPublisher{
 
 public:
 
-  VideoCapture(const StreamMedium& stream_medium);
+  CamPublisher(VideoPublisher *video_streamer);
 
   void start();
 
   void stop();
 
-private:
-
   void run();
 
 private:
 
-  StreamMedium stream_medium_;
+  VideoPublisher* video_streamer_;
+  std::vector<unsigned char> bytes_;
   cv::VideoCapture capture_;
   std::thread thread_;
 
