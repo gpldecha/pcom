@@ -5,17 +5,23 @@ import time
 
 # Socket to talk to server
 context = zmq.Context()
-subscriber = context.socket(zmq.SUB)
-subscriber.connect ("tcp://localhost:5558")
-#subscriber.connect("ipc://example")
-subscriber.setsockopt(zmq.SUBSCRIBE, b'B')
+sub = context.socket(zmq.SUB)
+sub.setsockopt(zmq.SUBSCRIBE, b'A')
+sub.setsockopt(zmq.CONFLATE, True)
+
+USE_ICP = True
+
+if USE_ICP:
+    sub.connect ("ipc:///tmp/zmq")
+else:
+    sub.connect ("tcp://0.0.0.0:5558")
 
 while True:
 
-    topic = subscriber.recv()
-    data = subscriber.recv_json()
-    print(data['time'])
-    print(data['position'])
-    print(data['velocity'])
+    topic = sub.recv()
+    # data = sub.recv()
+    data = sub.recv_pyobj()
 
-    time.sleep(0.01)
+    print(data)
+
+    time.sleep(0.5)
