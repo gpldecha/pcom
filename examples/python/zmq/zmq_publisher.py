@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 import zmq
 import sys
 import time
@@ -6,8 +6,9 @@ import os
 
 context = zmq.Context()
 pub = context.socket(zmq.PUB)
+pub.setsockopt(zmq.SNDHWM, 2)
 
-USE_ICP = True
+USE_ICP = False
 
 if USE_ICP:
     pub.bind("ipc:///tmp/zmq")
