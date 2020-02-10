@@ -28,11 +28,11 @@ if __name__ == "__main__":
             count += 1
             if time.time() - s_time >= 1.0:
                 frequency = count/1.0
-                #print('time {} frequency {}'.format(data['time'], count))
+                print('time {} frequency {}'.format(data['time'], count))
                 count = 0
                 s_time = time.time()
             frame = data['image']
-            #frame = cv2.imdecode(frame, 1)
+            frame = cv2.imdecode(frame, 1)
             cv2.putText(frame,str(frequency) + ' fps', (20,50), cv2.FONT_HERSHEY_SIMPLEX, 1.5,(255,0,0),3,cv2.LINE_AA)
             cv2.imshow('consumer_' + str(args.name), frame)
             cv2.waitKey(1)

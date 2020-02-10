@@ -20,6 +20,7 @@ if __name__ == "__main__":
     while True:
 
         ret, frame = cap.read()
+        _, frame = cv2.imencode('.JPEG', frame, encode_param)
         publisher.send({'time': i, 'image': frame})
         i += 1
 

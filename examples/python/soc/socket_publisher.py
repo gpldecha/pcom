@@ -34,7 +34,7 @@ class Publisher(mp.Process):
         self._port = port
         self._is_verbose = is_verbose
         self._lock = mp.Lock()
-        self._data_queue = mp.Queue(maxsize=10)
+        self._data_queue = mp.Queue(maxsize=2)
         self.start()
 
     def _apply_lock(self, func):
@@ -87,7 +87,6 @@ class Publisher(mp.Process):
         for key in to_remove:
             clients.pop(key)
             try:
-                # sel.unregister(sock)
                 sock.close()
                 print('unregister: {}'.format(key))
             except:
@@ -145,6 +144,8 @@ class Publisher(mp.Process):
     def _sendall_data(self, connection, message):
         try:
             connection.sendall(message)
+        except socket.error as e:
+            print(e)
         except:
             self._print_msg('client thread unable to send data!, closing for now')
             connection.close()
@@ -155,7 +156,7 @@ class Publisher(mp.Process):
         conn, addr = sock.accept()
         ip, port = addr
         self._print_msg('accepted connection from: {}'.format(addr))
-        conn.setblocking(False)
+        conn.setblocking(True)
         data = types.SimpleNamespace(addr=addr, inb=b'', outb=b'')
         events = selectors.EVENT_READ | selectors.EVENT_WRITE
         try:
